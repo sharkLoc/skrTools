@@ -3,7 +3,7 @@
 
 # install
 ```
-git clone 
+git clone https://github.com/sharkLoc/skrTools.git
 cd skrTools && make 
 ```
 
