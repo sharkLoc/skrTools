@@ -1,4 +1,11 @@
 # skrTools
+> a little demo
+
+# install
+```
+git clone 
+cd skrTools && make 
+```
 
 # usage
 ```
