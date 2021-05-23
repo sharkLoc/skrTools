@@ -208,7 +208,7 @@ void statVcfs(int argc, char *argv[])
 				if(i==3) ref=*tmp;
 				if(i==4) alt=*tmp;
 			}
-			if(ref =='A' && alt == 'T')	geno.AT++;
+			if(ref =='A' && alt == 'T') geno.AT++;
 			if(ref =='A' && alt == 'G') geno.AG++;
 			if(ref =='A' && alt == 'C') geno.AC++;
 			if(ref =='T' && alt == 'A') geno.TA++;
