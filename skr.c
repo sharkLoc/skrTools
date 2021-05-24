@@ -73,7 +73,7 @@ void mergeVcfs(int argc, char *argv[])
 		
 		while((line=readline(vcf)) != NULL)
 		{
-			if(1==1)
+			if(i==1)
 			{ 
 				if(line[0] != '#') count++;
 				gzprintf(fo,"%s\n",line);
@@ -90,6 +90,7 @@ void mergeVcfs(int argc, char *argv[])
 			free(line);
 		}
 		gzclose(vcf);
+		fprintf(stderr,"file %s done !\n",list);
 		free(list);
 	}
 	gzclose(fp);
