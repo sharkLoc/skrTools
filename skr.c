@@ -240,3 +240,56 @@ void statVcfs(int argc, char *argv[])
 	fclose(fo);
 	return ;
 }
+
+void makewind(int argc, char *argv[])
+{
+	gzFile fp; int r;  
+	long int w=10000,i,tmp;
+	while((r=getopt(argc,argv,"i:w:h")) != -1)
+	{
+		switch(r)
+		{
+			case 'i': fp =gzopen(optarg,"r"); break;
+			case 'w': w = atol(optarg); break;
+			case 'h':
+			case '?':
+				fprintf(stderr, "makewind	make bed region from chrlen list\n\n");
+				fprintf(stderr, "           -i  :<char> chrlen file, two columns per line are split by tabs and no blank line\n");
+				fprintf(stderr, "                       example: chr1\t15000000\n");
+				fprintf(stderr, "                                chr2\t12000000\n\n");
+				fprintf(stderr, "           -w  :<int>	window length, default[%ld]\n",w);
+				fprintf(stderr, "           -h  :<char>	show this help\n\n");
+				break;
+		}
+	}
+	if(argc<=2)
+	{
+		fprintf(stderr, "makewind   make bed region from chrlen list\n\n");
+		fprintf(stderr, "           -i  :<char> chrlen file, two columns per line are split by tabs and no blank line\n");
+		fprintf(stderr, "                       example: chr1\t15000000\n");
+		fprintf(stderr, "                                chr2\t12000000\n\n");
+		fprintf(stderr, "           -w  :<int>  window length, default[%ld]\n",w);
+		fprintf(stderr, "           -h  :<char> show this help\n\n");
+	}
+	if(!fp) exit(1);
+
+	char *line, *col1, *col2 = NULL;
+	while((line=readline(fp)) != NULL)
+	{
+		
+		col1=strtok(line,"\t");
+		col2=strtok(NULL,"\t");
+		for(i=1; i<=atol(col2); i+=w)
+		{
+			tmp = i + w - 1;
+			if(tmp>atol(col2))
+				tmp = atol(col2);
+			fprintf(stdout,"%s\t%ld\t%ld\n",col1,i,tmp);
+		}
+		
+		free(line);
+	}
+	gzclose(fp);
+	return ;	
+}
+
