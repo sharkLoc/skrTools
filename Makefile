@@ -3,7 +3,7 @@ OBJS=main.o skr.o
 CFLAGS+=-c -Wall -g -lz -std=c99
 
 skr:$(OBJS)
-	$(CC) $^ -lz -o $@
+	$(CC) $^ -lz -O3 -o $@
 
 %.o:%.c
 	$(CC) $^ $(CFLAGS) -o $@
