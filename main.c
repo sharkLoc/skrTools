@@ -25,17 +25,21 @@ int main(int argc, char *argv[])
 	{
 		mergeVcfs(argc, argv);	
 	}
-	if(strcmp(argv[1],"fq2fa") == 0)
+	else if(strcmp(argv[1],"fq2fa") == 0)
 	{
 		fq2fa(argc, argv);
 	}
-	if(strcmp(argv[1],"statVcf")==0)
+	else if(strcmp(argv[1],"statVcf")==0)
 	{
 		statVcfs(argc,argv);
 	}
-	if(strcmp(argv[1],"makewind")==0)
+	else if(strcmp(argv[1],"makewind")==0)
 	{
 		makewind(argc,argv);	
+	}
+	else
+	{
+		fprintf(stderr,"%s: invalid option -- '%s'\n",argv[0],argv[1]);	
 	}
 
 	exit(0);
