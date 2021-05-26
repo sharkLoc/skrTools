@@ -11,4 +11,6 @@ void fq2fa(int argc, char *argv[]);
 
 void statVcfs(int argc, char *argv[]);
 
+void makewind(int argc, char *argv[]);
+
 #endif
