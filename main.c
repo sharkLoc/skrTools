@@ -9,9 +9,10 @@ static int usage(void)
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Program: skr (名字我瞎编的,嘿嘿！)\n");
 	fprintf(stderr, "Usage: skr <command> [options]\n\n");
-	fprintf(stderr, "\tmergeVcf   merge vcf files from list\n");
 	fprintf(stderr, "\tfq2fa      translate fastq file to fasta\n");
+	fprintf(stderr, "\tmergeVcf   merge vcf files from list\n");
 	fprintf(stderr, "\tstatVcf    summary statistics of vcf file\n");
+	fprintf(stderr, "\tmakewind   make bed from a list file\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
@@ -32,5 +33,10 @@ int main(int argc, char *argv[])
 	{
 		statVcfs(argc,argv);
 	}
+	if(strcmp(argv[1],"makewind")==0)
+	{
+		makewind(argc,argv);	
+	}
+
 	exit(0);
 }
