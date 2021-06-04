@@ -17,6 +17,4 @@ Usage: skr <command> [options]
         mergeVcf   merge vcf files from list
         statVcf    summary statistics of vcf file
         makewind   make bed from a list file
-
-
 ```
