@@ -13,8 +13,9 @@ Program: skr (名字我瞎编的,嘿嘿！)
 
 Usage: skr <command> [options]
 
-        fq2fa      translate fastq file to fasta
-        mergeVcf   merge vcf files from list
-        statVcf    summary statistics of vcf file
-        makewind   make bed from a list file
+	fq2fa      translate fastq file to fasta
+	fqstat     summary statistics of fastq file
+	mergeVcf   merge vcf files from list
+	statVcf    summary statistics of vcf file
+	makewind   make bed from a list file
 ```
