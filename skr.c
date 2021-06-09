@@ -59,6 +59,7 @@ void mergeVcfs(int argc, char *argv[])
 		fprintf(stderr, "            -l :<char>    vcf list file, one file per line and no blank line\n");
 		fprintf(stderr, "            -o :<char>    merged vcf[.gz] file name\n");
 		fprintf(stderr, "            -h :<char>    show this help\n\n");
+		exit(1);
 	}
 	if(!fp || !fo) exit(1);
 
@@ -124,6 +125,7 @@ void fq2fa(int argc, char *argv[])
 		fprintf(stderr, "            -i :<char>    fastq file\n");
 		fprintf(stderr, "            -o :<char>    fasta file[.gz]\n");
 		fprintf(stderr, "            -h :<char>    show this help\n\n");
+		exit(1);
 	}
 	if(!fp || !fo) exit(1);
 
@@ -181,6 +183,7 @@ void statVcfs(int argc, char *argv[])
 		fprintf(stderr, "            -i :<char>    input vcf file\n");
 		fprintf(stderr, "            -o :<char>    output state file name\n");
 		fprintf(stderr, "            -h :<char>    show this help\n\n");
+		exit(1);
 	}
 	if(!fp || !fo) exit(1);
 	struct GT {
@@ -270,6 +273,7 @@ void makewind(int argc, char *argv[])
 		fprintf(stderr, "                                chr2\t12000000\n\n");
 		fprintf(stderr, "           -w  :<int>  window length, default[%ld]\n",w);
 		fprintf(stderr, "           -h  :<char> show this help\n\n");
+		exit(1);
 	}
 	if(!fp) exit(1);
 
@@ -293,3 +297,164 @@ void makewind(int argc, char *argv[])
 	return ;	
 }
 
+uint64_t qualityN(char *line,size_t q)
+{
+	int i=0; uint64_t qCount=0;
+	while(line[i]!='\0')
+	{
+		if(line[i]-33>=q) qCount++;
+		i++;
+	}
+	return qCount;
+}
+
+void freeRead(rinfo read)
+{
+	for(int i=0; i<4; i++)
+	{
+		free(read.line[i]);
+		read.line[i]=NULL;
+	}
+	return ;
+}
+
+void fqstat(int argc, char *argv[])
+{
+	gzFile fp, fd;
+	int result;
+	while((result = getopt(argc, argv, "i:I:h")) != -1)
+	{
+		switch(result)
+		{
+			case 'i': fp = gzopen(optarg,"r"); break;
+			case 'I': fd = gzopen(optarg,"r"); break;
+			case 'h':
+			case '?':
+				fprintf(stderr, "fqstat     summary statistics of PE fastq file\n\n");
+				fprintf(stderr, "           -i  :<char> clean fastq1[.gz] file name\n");
+				fprintf(stderr, "           -I  :<char> clean fastq2[.gz] file name\n");
+				fprintf(stderr, "           -h  :<char> show this help\n\n");			
+				break;
+		}
+	}
+	if(argc<=2)
+	{
+		fprintf(stderr, "fqstat     summary statistics of vcf file\n\n");
+		fprintf(stderr, "           -i  :<char> clean fastq1[.gz] file name\n");
+		fprintf(stderr, "           -I  :<char> clean fastq2[.gz] file name\n");
+		fprintf(stderr, "           -h  :<char> show this help\n\n");
+		exit(1);
+	}
+
+	if(!fp || !fd)  exit(1);
+	stat stat_1={0.,0.,0,0,0,0,0,0,0,0,0}; 
+	stat stat_2={0.,0.,0,0,0,0,0,0,0,0,0}; 
+	int flag=1;
+	while(flag)
+	{
+		rinfo read1={{NULL,NULL,NULL,NULL},0};
+		rinfo read2={{NULL,NULL,NULL,NULL},0};
+		for(int i=0; i<4; i++)
+		{
+			char *r1=readline(fp);
+			char *r2=readline(fd);
+			if(r1 && r2)
+			{
+				size_t len1 = strlen(r1);
+				size_t len2 = strlen(r2);
+				read1.line[i]=(char *)malloc(len1+1); 
+				read2.line[i]=(char *)malloc(len2+1);
+				if(!read1.line[i] || !read2.line[i]) exit(1);
+				strncpy(read1.line[i],r1,len1+1);
+				strncpy(read2.line[i],r2,len2+1);
+				if(i==1)
+				{
+					read1.len=len1; 
+					read2.len=len2;
+				}
+			}
+			else
+			{
+				flag=0;
+			}
+			free(r1);
+			free(r2);
+		}
+	
+		if(flag)
+		{
+			for(int i=0; i<4; i++)
+			{
+				if(i==1)
+				{
+					int k=0; stat_1.readCount++;
+					while(read1.line[i][k] != '\0')
+					{
+						if(read1.line[i][k] == 'A') stat_1.aCount++;
+						if(read1.line[i][k] == 'T') stat_1.tCount++;
+						if(read1.line[i][k] == 'G') stat_1.gCount++;
+						if(read1.line[i][k] == 'C') stat_1.cCount++;
+						if(read1.line[i][k] == 'N') stat_1.nCount++;
+						k++; 
+						stat_1.baseCount++;
+					}
+					int s=0; stat_2.readCount++;
+					while(read2.line[i][s] != '\0')
+					{
+						if(read2.line[i][s] == 'A') stat_2.aCount++;
+						if(read2.line[i][s] == 'T') stat_2.tCount++;
+						if(read2.line[i][s] == 'G') stat_2.gCount++;
+						if(read2.line[i][s] == 'C') stat_2.cCount++;
+						if(read2.line[i][s] == 'N') stat_2.nCount++;
+						s++; 
+						stat_2.baseCount++;
+					}
+				}
+				if(i==3)
+				{
+					stat_1.q20 += qualityN(read1.line[i],Q20);
+					stat_1.q30 += qualityN(read1.line[i],Q30);
+					stat_2.q20 += qualityN(read2.line[i],Q20);
+					stat_2.q30 += qualityN(read2.line[i],Q30);
+				}
+			}
+			freeRead(read1); 
+			freeRead(read2);
+		}
+	}
+	gzclose(fp); 
+	gzclose(fd);
+
+	stat_1.averageLen = (float)stat_1.baseCount / stat_1.readCount;
+	stat_2.averageLen = (float)stat_2.baseCount / stat_2.readCount;
+	stat_1.gc = (float)(stat_1.gCount + stat_1.cCount) / stat_1.baseCount * 100;
+	stat_2.gc = (float)(stat_2.gCount + stat_2.cCount) / stat_2.baseCount * 100;
+
+	fprintf(stdout,"Iterm\treads_1.fq\treads_2.fq\n");
+	fprintf(stdout,"read average length:\t%d\t%d\n",(int)stat_1.averageLen,(int)stat_2.averageLen);
+	fprintf(stdout,"read GC content(%%):\t%.2f\t%.2f\n",stat_1.gc,stat_2.gc);
+	fprintf(stdout,"total read Count:\t%lu\t%lu\n",stat_1.readCount,stat_2.readCount);
+	fprintf(stdout,"total base Count:\t%lu\t%lu\n",stat_1.baseCount,stat_2.baseCount);
+	
+	fprintf(stdout,"\n");
+	fprintf(stdout,"base A Count:\t%lu(%.2f%%)\t%lu(%.2f%%)\n", \
+			stat_1.aCount,(float)stat_1.aCount/stat_1.baseCount*100.,stat_2.aCount,(float)stat_2.aCount/stat_2.baseCount*100.);
+
+	fprintf(stdout,"base C Count:\t%lu(%.2f%%)\t%lu(%.2f%%)\n", \
+			stat_1.cCount,(float)stat_1.cCount/stat_1.baseCount*100.,stat_2.cCount,(float)stat_2.cCount/stat_2.baseCount*100.);
+
+	fprintf(stdout,"base G Count:\t%lu(%.2f%%)\t%lu(%.2f%%)\n", \
+			stat_1.gCount,(float)stat_1.gCount/stat_1.baseCount*100.,stat_2.gCount,(float)stat_2.gCount/stat_2.baseCount*100.);
+
+	fprintf(stdout,"base T Count:\t%lu(%.2f%%)\t%lu(%.2f%%)\n", \
+			stat_1.tCount,(float)stat_1.tCount/stat_1.baseCount*100.,stat_2.tCount,(float)stat_2.tCount/stat_2.baseCount*100.); 
+
+	fprintf(stdout,"base N Count:\t%lu(%.2f%%)\t%lu(%.2f%%)\n", \
+			stat_1.nCount,(float)stat_1.nCount/stat_1.baseCount*100.,stat_2.nCount,(float)stat_2.nCount/stat_2.baseCount*100.);
+
+	fprintf(stdout,"\n");
+	fprintf(stdout,"Number of base calls with quality value of 20 or higher (Q20+) (%%)\t%lu(%.2f%%)\t%lu(%.2f%%)\n",stat_1.q20,(float)stat_1.q20/stat_1.baseCount*100.,stat_2.q20,(float)stat_2.q20/stat_2.baseCount*100.);
+	fprintf(stdout,"Number of base calls with quality value of 30 or higher (Q30+) (%%)\t%lu(%.2f%%)\t%lu(%.2f%%)\n",stat_1.q30,(float)stat_1.q30/stat_1.baseCount*100.,stat_2.q30,(float)stat_2.q30/stat_2.baseCount*100.);
+
+	return ;
+}
