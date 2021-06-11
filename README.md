@@ -9,7 +9,7 @@ cd skrTools && make
 
 # usage
 ```
-Program: skr (名字我瞎编的,嘿嘿！)
+Program: skr 
 
 Usage: skr <command> [options]
 
