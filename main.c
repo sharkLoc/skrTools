@@ -7,7 +7,7 @@
 static int usage(void)
 {
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Program: skr (名字我瞎编的,嘿嘿！)\n");
+	fprintf(stderr, "Program: skr \n");
 	fprintf(stderr, "Usage: skr <command> [options]\n\n");
 	fprintf(stderr, "\tfq2fa      translate fastq file to fasta\n");
 	fprintf(stderr, "\tfqstat     summary statistics of fastq file\n");
