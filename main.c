@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "skr.h"
 
 static int usage(void)
@@ -14,6 +13,7 @@ static int usage(void)
 	fprintf(stderr, "\tmergeVcf   merge vcf files from list\n");
 	fprintf(stderr, "\tstatVcf    summary statistics of vcf file\n");
 	fprintf(stderr, "\tmakewind   make bed from a list file\n");
+	fprintf(stderr, "\n");
 	fprintf(stderr, "\n");
 	return 1;
 }
